@@ -666,6 +666,7 @@ export default function EditBillPage() {
             </div>
 
             {/* Items */}
+            {/* Items */}
             <div>
               <div className="mb-3 flex items-center justify-between">
                 <h2 className="text-base font-semibold text-gray-800">
@@ -682,15 +683,17 @@ export default function EditBillPage() {
                 </button>
               </div>
 
-              <div className="space-y-3">
-                {items.map(
-                  (item, index) => (
+              {/* Horizontal scroll on mobile */}
+              <div className="overflow-x-auto">
+                <div className="min-w-212.5 space-y-3">
+
+                  {items.map((item) => (
                     <div
                       key={item.id}
-                      className="grid gap-2 rounded-md border border-gray-200 p-3 sm:grid-cols-12"
+                      className="grid grid-cols-12 gap-2 rounded-md border border-gray-200 p-3"
                     >
                       {/* Model */}
-                      <div className="sm:col-span-4">
+                      <div className="col-span-4">
                         <label className="mb-1 block text-xs text-gray-500">
                           Model Number
                         </label>
@@ -698,7 +701,11 @@ export default function EditBillPage() {
                         <textarea
                           value={item.model}
                           onChange={(e) =>
-                            updateItem(item.id, "model", e.target.value)
+                            updateItem(
+                              item.id,
+                              "model",
+                              e.target.value
+                            )
                           }
                           rows={3}
                           className="w-full resize-none rounded border border-gray-300 px-2 py-1.5 text-sm outline-none focus:border-blue-500"
@@ -706,7 +713,7 @@ export default function EditBillPage() {
                       </div>
 
                       {/* Quantity */}
-                      <div className="sm:col-span-2">
+                      <div className="col-span-2">
                         <label className="mb-1 block text-xs text-gray-500">
                           Qty
                         </label>
@@ -717,7 +724,6 @@ export default function EditBillPage() {
                           onWheel={(e) => {
                             e.currentTarget.blur();
                           }}
-
                           onChange={(e) =>
                             updateItem(
                               item.id,
@@ -725,12 +731,12 @@ export default function EditBillPage() {
                               e.target.value
                             )
                           }
-                          className="w-full rounded-md border border-gray-300 px-2.5 py-2 text-sm outline-none"
+                          className="w-full rounded-md border border-gray-300 px-2.5 py-2 text-sm outline-none focus:border-blue-500"
                         />
                       </div>
 
                       {/* Rate */}
-                      <div className="sm:col-span-2">
+                      <div className="col-span-2">
                         <label className="mb-1 block text-xs text-gray-500">
                           Rate
                         </label>
@@ -741,7 +747,6 @@ export default function EditBillPage() {
                           onWheel={(e) => {
                             e.currentTarget.blur();
                           }}
-
                           onChange={(e) =>
                             updateItem(
                               item.id,
@@ -749,12 +754,12 @@ export default function EditBillPage() {
                               e.target.value
                             )
                           }
-                          className="w-full rounded-md border border-gray-300 px-2.5 py-2 text-sm outline-none"
+                          className="w-full rounded-md border border-gray-300 px-2.5 py-2 text-sm outline-none focus:border-blue-500"
                         />
                       </div>
 
                       {/* Discount */}
-                      <div className="sm:col-span-2">
+                      <div className="col-span-2">
                         <label className="mb-1 block text-xs text-gray-500">
                           Discount %
                         </label>
@@ -765,7 +770,6 @@ export default function EditBillPage() {
                           onWheel={(e) => {
                             e.currentTarget.blur();
                           }}
-
                           onChange={(e) =>
                             updateItem(
                               item.id,
@@ -773,12 +777,12 @@ export default function EditBillPage() {
                               e.target.value
                             )
                           }
-                          className="w-full rounded-md border border-gray-300 px-2.5 py-2 text-sm outline-none"
+                          className="w-full rounded-md border border-gray-300 px-2.5 py-2 text-sm outline-none focus:border-blue-500"
                         />
                       </div>
 
                       {/* Delete */}
-                      <div className="flex items-end sm:col-span-2">
+                      <div className="col-span-2 flex items-end">
                         <button
                           type="button"
                           onClick={() =>
@@ -791,19 +795,18 @@ export default function EditBillPage() {
                       </div>
 
                       {/* Item Total */}
-                      <div className="sm:col-span-12">
+                      <div className="col-span-12">
                         <p className="text-right text-sm font-medium text-gray-700">
                           Total: ₹
-                          {calculateItemTotal(
-                            item
-                          ).toLocaleString(
+                          {calculateItemTotal(item).toLocaleString(
                             "en-IN"
                           )}
                         </p>
                       </div>
                     </div>
-                  )
-                )}
+                  ))}
+
+                </div>
               </div>
             </div>
 

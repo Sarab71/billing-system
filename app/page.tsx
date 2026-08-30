@@ -106,12 +106,12 @@ export default function Home() {
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-gray-50">
-      <div className="flex flex-col lg:flex-row">
+      <div className="flex min-h-[calc(100vh-64px)]">
         {/* Today's Due Sidebar */}
         <Sidebar />
 
         {/* Main Dashboard */}
-        <main className="flex-1 p-5 sm:p-8">
+        <main className="min-w-0 flex-1 p-3 sm:p-5 lg:p-8">
           <div className="mx-auto max-w-7xl">
             {/* Welcome Section */}
             <div className="text-center">

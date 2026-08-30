@@ -37,7 +37,7 @@ export default function Navbar() {
             className="flex items-center gap-2 text-lg font-bold text-gray-800"
           >
 
-            <span className="hidden sm:block">
+            <span className="sm:block">
               Billing System
             </span>
           </a>

@@ -10,12 +10,12 @@ interface DueBill {
   grandTotal: number;
   dueDate: string;
   customer:
-    | string
-    | {
-        _id: string;
-        name: string;
-        phone?: string;
-      };
+  | string
+  | {
+    _id: string;
+    name: string;
+    phone?: string;
+  };
 }
 
 export default function Sidebar() {
@@ -68,16 +68,28 @@ export default function Sidebar() {
   }, [fetchDueBills]);
 
   return (
-    <aside className="w-full border-b border-gray-200 bg-white lg:min-h-[calc(100vh-64px)] lg:w-72 lg:border-r lg:border-b-0">
-
+    <aside
+      className="
+      h-[calc(100vh-64px)]
+      w-40
+      shrink-0
+      overflow-hidden
+      border-r
+      border-gray-200
+      bg-white
+      sm:w-52
+      md:w-60
+      lg:w-72
+    "
+    >
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-        <h2 className="text-base font-semibold text-gray-800">
+      <div className="flex items-center justify-between border-b border-gray-100 px-3 py-3 sm:px-4 sm:py-4">
+        <h2 className="text-xs font-semibold text-gray-800 sm:text-sm lg:text-base">
           Today&apos;s Due
         </h2>
 
         {!loading && bills.length > 0 && (
-          <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600">
+          <span className="rounded-full bg-red-50 px-1.5 py-0.5 text-[10px] font-medium text-red-600 sm:px-2 sm:text-xs">
             {bills.length}
           </span>
         )}
@@ -85,35 +97,32 @@ export default function Sidebar() {
 
       {/* Loading */}
       {loading ? (
-        <div className="flex min-h-56 items-center justify-center px-5">
-          <p className="text-sm text-gray-400">
+        <div className="flex min-h-40 items-center justify-center px-3">
+          <p className="text-xs text-gray-400 sm:text-sm">
             Loading...
           </p>
         </div>
       ) : bills.length === 0 ? (
-
         /* Empty State */
-        <div className="flex min-h-56 flex-col items-center justify-center px-5 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-50">
+        <div className="flex min-h-40 flex-col items-center justify-center px-3 text-center sm:px-4 lg:min-h-56">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 sm:h-12 sm:w-12 lg:h-14 lg:w-14">
             <CalendarDays
-              size={25}
-              className="text-blue-600"
+              size={20}
+              className="text-blue-600 sm:h-5.75 sm:w-5.75"
             />
           </div>
 
-          <p className="mt-4 text-sm font-medium text-gray-700">
+          <p className="mt-3 text-xs font-medium text-gray-700 sm:text-sm lg:mt-4">
             No due bills today
           </p>
 
-          <p className="mt-1 max-w-48 text-xs leading-5 text-gray-400">
+          <p className="mt-1 text-[10px] leading-4 text-gray-400 sm:text-xs sm:leading-5">
             Upcoming payments and due bills will appear here.
           </p>
         </div>
-
       ) : (
-
         /* Due Bills */
-        <div className="max-h-[calc(100vh-130px)] overflow-y-auto p-3">
+        <div className="h-[calc(100vh-120px)] overflow-y-auto p-2 sm:p-3">
           <div className="space-y-2">
             {bills.map((bill) => {
               const customerName =
@@ -128,25 +137,38 @@ export default function Sidebar() {
                   onClick={() =>
                     router.push(`/edit-bill/${bill._id}`)
                   }
-                  className="w-full cursor-pointer rounded-lg border border-gray-200 bg-white p-3 text-left transition hover:border-blue-200 hover:bg-blue-50"
+                  className="
+                  w-full
+                  cursor-pointer
+                  rounded-lg
+                  border
+                  border-gray-200
+                  bg-white
+                  p-2
+                  text-left
+                  transition
+                  hover:border-blue-200
+                  hover:bg-blue-50
+                  sm:p-3
+                "
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="text-sm font-semibold text-gray-800">
+                  <div className="flex items-start justify-between gap-1 sm:gap-2">
+                    <p className="min-w-0 truncate text-[11px] font-semibold text-gray-800 sm:text-sm">
                       {customerName}
                     </p>
 
-                    <span className="text-xs text-gray-400">
+                    <span className="shrink-0 text-[9px] text-gray-400 sm:text-xs">
                       #{bill.invoiceNumber}
                     </span>
                   </div>
 
-                  <div className="mt-2 flex items-center justify-between">
-                    <span className="text-xs text-gray-500">
-                      Bill Amount
+                  <div className="mt-2 flex items-center justify-between gap-1">
+                    <span className="text-[9px] text-gray-500 sm:text-xs">
+                      Amount
                     </span>
 
-                    <span className="flex items-center text-sm font-semibold text-red-600">
-                      <IndianRupee size={13} />
+                    <span className="flex shrink-0 items-center text-[11px] font-semibold text-red-600 sm:text-sm">
+                      <IndianRupee size={11} />
 
                       {Number(
                         bill.grandTotal

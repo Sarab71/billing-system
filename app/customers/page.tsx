@@ -192,10 +192,10 @@ export default function CustomersPage() {
                 />
 
                 {/* RIGHT SIDE */}
-                <main className="flex-1 p-4 sm:p-6">
+                <main className="min-w-0 flex-1 p-2 sm:p-4 lg:p-6">
                     {!selectedCustomer ? (
-                        <div className="flex h-full items-center justify-center">
-                            <p className="text-sm text-gray-500">
+                        <div className="flex min-h-[calc(100vh-64px)] items-center justify-center p-3">
+                            <p className="text-center text-xs text-gray-500 sm:text-sm">
                                 Select a customer to view details
                             </p>
                         </div>
@@ -203,35 +203,37 @@ export default function CustomersPage() {
                         <div className="mx-auto max-w-7xl">
 
                             {/* PAGE HEADER */}
-                            <div className="flex items-center justify-between">
-                                <h1 className="text-2xl font-bold text-gray-900">
+                            <div className="flex items-center justify-between gap-2">
+                                <h1 className="text-base font-bold text-gray-900 sm:text-xl lg:text-2xl">
                                     Customer Details
                                 </h1>
 
                                 <button
+                                    type="button"
                                     onClick={() =>
                                         toast.info("Edit customer feature coming soon")
                                     }
-                                    className="cursor-pointer flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                                    className="flex shrink-0 cursor-pointer items-center gap-1 rounded-md bg-blue-600 px-2 py-1.5 text-xs font-medium text-white transition hover:bg-blue-700 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm"
                                 >
-                                    <Edit size={16} />
+                                    <Edit size={14} className="sm:hidden" />
+                                    <Edit size={16} className="hidden sm:block" />
                                     Edit
                                 </button>
                             </div>
 
                             {/* STATEMENT CARD */}
-                            <div className="mt-5 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
+                            <div className="mt-3 rounded-lg border border-gray-200 bg-white p-2 shadow-sm sm:mt-5 sm:p-4 lg:p-5">
 
-                                <h2 className="text-xl font-bold text-gray-900">
+                                <h2 className="text-sm font-bold text-gray-900 sm:text-lg lg:text-xl">
                                     Statement of {selectedCustomer.name}
                                 </h2>
 
                                 {/* DATE FILTERS */}
-                                <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                                <div className="mt-3 flex flex-col gap-2 sm:mt-5 sm:flex-row sm:gap-3">
 
                                     {/* START DATE */}
-                                    <div>
-                                        <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                    <div className="min-w-0 flex-1 sm:flex-none">
+                                        <label className="mb-1 block text-xs font-medium text-gray-700 sm:mb-1.5 sm:text-sm">
                                             Start Date
                                         </label>
 
@@ -242,19 +244,19 @@ export default function CustomersPage() {
                                                 onChange={(e) =>
                                                     setStartDate(e.target.value)
                                                 }
-                                                className="w-full rounded-md border border-gray-300 px-3 py-2 pr-9 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:w-56"
+                                                className="w-full rounded-md border border-gray-300 px-2 py-1.5 pr-8 text-xs text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:w-56 sm:px-3 sm:py-2 sm:pr-9 sm:text-sm"
                                             />
 
                                             <Calendar
-                                                size={16}
-                                                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                                size={13}
+                                                className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 sm:right-3 sm:h-4 sm:w-4"
                                             />
                                         </div>
                                     </div>
 
                                     {/* END DATE */}
-                                    <div>
-                                        <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                    <div className="min-w-0 flex-1 sm:flex-none">
+                                        <label className="mb-1 block text-xs font-medium text-gray-700 sm:mb-1.5 sm:text-sm">
                                             End Date
                                         </label>
 
@@ -265,39 +267,39 @@ export default function CustomersPage() {
                                                 onChange={(e) =>
                                                     setEndDate(e.target.value)
                                                 }
-                                                className="w-full rounded-md border border-gray-300 px-3 py-2 pr-9 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:w-56"
+                                                className="w-full rounded-md border border-gray-300 px-2 py-1.5 pr-8 text-xs text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:w-56 sm:px-3 sm:py-2 sm:pr-9 sm:text-sm"
                                             />
 
                                             <Calendar
-                                                size={16}
-                                                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                                size={13}
+                                                className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 sm:right-3 sm:h-4 sm:w-4"
                                             />
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* TABLE */}
-                                <div className="mt-5 overflow-x-auto">
-                                    <table className="w-full min-w-175 border-collapse">
+                                <div className="mt-3 overflow-x-auto sm:mt-5">
+                                    <table className="min-w-175 w-full border-collapse">
                                         <thead>
                                             <tr className="bg-gray-100">
-                                                <th className="border border-gray-400 px-3 py-2 text-left text-sm font-semibold text-gray-800">
+                                                <th className="border border-gray-400 px-2 py-1.5 text-left text-xs font-semibold text-gray-800 sm:px-3 sm:py-2 sm:text-sm">
                                                     Date
                                                 </th>
 
-                                                <th className="border border-gray-400 px-3 py-2 text-left text-sm font-semibold text-gray-800">
+                                                <th className="border border-gray-400 px-2 py-1.5 text-left text-xs font-semibold text-gray-800 sm:px-3 sm:py-2 sm:text-sm">
                                                     Particulars
                                                 </th>
 
-                                                <th className="border border-gray-400 px-3 py-2 text-right text-sm font-semibold text-gray-800">
+                                                <th className="border border-gray-400 px-2 py-1.5 text-right text-xs font-semibold text-gray-800 sm:px-3 sm:py-2 sm:text-sm">
                                                     Debit (₹)
                                                 </th>
 
-                                                <th className="border border-gray-400 px-3 py-2 text-right text-sm font-semibold text-gray-800">
+                                                <th className="border border-gray-400 px-2 py-1.5 text-right text-xs font-semibold text-gray-800 sm:px-3 sm:py-2 sm:text-sm">
                                                     Credit (₹)
                                                 </th>
 
-                                                <th className="border border-gray-400 px-3 py-2 text-right text-sm font-semibold text-gray-800">
+                                                <th className="border border-gray-400 px-2 py-1.5 text-right text-xs font-semibold text-gray-800 sm:px-3 sm:py-2 sm:text-sm">
                                                     Balance (₹)
                                                 </th>
                                             </tr>
@@ -308,10 +310,10 @@ export default function CustomersPage() {
                                                 <tr>
                                                     <td
                                                         colSpan={5}
-                                                        className="border border-gray-300 py-8 text-center"
+                                                        className="border border-gray-300 py-6 text-center sm:py-8"
                                                     >
                                                         <Loader2
-                                                            size={22}
+                                                            size={20}
                                                             className="mx-auto animate-spin text-blue-600"
                                                         />
                                                     </td>
@@ -320,7 +322,7 @@ export default function CustomersPage() {
                                                 <tr>
                                                     <td
                                                         colSpan={5}
-                                                        className="border border-gray-300 py-8 text-center text-sm text-gray-400"
+                                                        className="border border-gray-300 py-6 text-center text-xs text-gray-400 sm:py-8 sm:text-sm"
                                                     >
                                                         No transactions found
                                                     </td>
@@ -332,17 +334,19 @@ export default function CustomersPage() {
                                                         className="hover:bg-gray-50"
                                                     >
                                                         {/* DATE */}
-                                                        <td className="border border-gray-300 px-3 py-2 text-sm text-gray-700">
+                                                        <td className="whitespace-nowrap border border-gray-300 px-2 py-1.5 text-xs text-gray-700 sm:px-3 sm:py-2 sm:text-sm">
                                                             {formatDate(transaction.date)}
                                                         </td>
 
                                                         {/* PARTICULARS */}
-                                                        <td className="border border-gray-300 px-3 py-2 text-sm">
-                                                            {transaction.invoiceNumber && transaction.relatedBill ? (
+                                                        <td className="border border-gray-300 px-2 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm">
+                                                            {transaction.invoiceNumber &&
+                                                                transaction.relatedBill ? (
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => {
-                                                                        const relatedBill = transaction.relatedBill;
+                                                                        const relatedBill =
+                                                                            transaction.relatedBill;
 
                                                                         if (!relatedBill) {
                                                                             toast.error("Bill ID not found");
@@ -354,41 +358,47 @@ export default function CustomersPage() {
                                                                                 ? relatedBill
                                                                                 : relatedBill._id;
 
-                                                                        router.push(`/edit-bill/${billId}`);
+                                                                        router.push(
+                                                                            `/edit-bill/${billId}`
+                                                                        );
                                                                     }}
-                                                                    className="font-medium text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+                                                                    className="cursor-pointer font-medium text-blue-600 hover:text-blue-800 hover:underline"
                                                                 >
-                                                                    Invoice #{transaction.invoiceNumber}
+                                                                    Invoice #
+                                                                    {transaction.invoiceNumber}
                                                                 </button>
                                                             ) : (
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => {
-                                                                        router.push(`/edit-payment/${transaction._id}`);
+                                                                        router.push(
+                                                                            `/edit-payment/${transaction._id}`
+                                                                        );
                                                                     }}
-                                                                    className="font-medium text-green-600 hover:text-green-800 hover:underline cursor-pointer"
+                                                                    className="cursor-pointer font-medium text-green-600 hover:text-green-800 hover:underline"
                                                                 >
-                                                                    {transaction.description || "Payment"}
+                                                                    {transaction.description ||
+                                                                        "Payment"}
                                                                 </button>
                                                             )}
                                                         </td>
 
                                                         {/* DEBIT */}
-                                                        <td className="border border-gray-300 px-3 py-2 text-right text-sm text-gray-700">
+                                                        <td className="whitespace-nowrap border border-gray-300 px-2 py-1.5 text-right text-xs text-gray-700 sm:px-3 sm:py-2 sm:text-sm">
                                                             {transaction.type === "debit"
                                                                 ? formatAmount(transaction.amount)
                                                                 : ""}
                                                         </td>
 
                                                         {/* CREDIT */}
-                                                        <td className="border border-gray-300 px-3 py-2 text-right text-sm text-gray-700">
+                                                        <td className="whitespace-nowrap border border-gray-300 px-2 py-1.5 text-right text-xs text-gray-700 sm:px-3 sm:py-2 sm:text-sm">
                                                             {transaction.type === "credit"
                                                                 ? formatAmount(transaction.amount)
                                                                 : ""}
                                                         </td>
 
                                                         {/* BALANCE */}
-                                                        <td className="border border-gray-300 px-3 py-2 text-right text-sm font-medium text-gray-800">
+                                                        <td className="whitespace-nowrap border border-gray-300 px-2 py-1.5 text-right text-xs font-medium text-gray-800 sm:px-3 sm:py-2 sm:text-sm">
                                                             {formatAmount(
                                                                 transaction.runningBalance
                                                             )}
@@ -404,10 +414,13 @@ export default function CustomersPage() {
                                 <button
                                     type="button"
                                     onClick={handleDownloadPDF}
-                                    disabled={!selectedCustomer || transactions.length === 0}
-                                    className="cursor-pointer flex items-center gap-2 rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50 mt-3"
+                                    disabled={
+                                        !selectedCustomer ||
+                                        transactions.length === 0
+                                    }
+                                    className="mt-3 flex cursor-pointer items-center gap-1.5 rounded-md bg-red-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50 sm:gap-2 sm:px-4 sm:text-sm"
                                 >
-                                    <Download size={17} />
+                                    <Download size={15} />
                                     Download PDF
                                 </button>
                             </div>
