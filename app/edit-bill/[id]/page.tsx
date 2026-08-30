@@ -74,49 +74,86 @@ export default function EditBillPage() {
         const billData = await billResponse.json();
         const customersData = await customersResponse.json();
 
-        if (
-          !billResponse.ok ||
-          !billData.success
-        ) {
+        // Bill fetch error
+        if (!billResponse.ok || !billData.success) {
           toast.error(
             billData.message || "Failed to fetch bill"
           );
+
           router.push("/customers");
           return;
         }
 
+        // Customers
         if (
           customersResponse.ok &&
           customersData.success
         ) {
-          setCustomers(customersData.customers || []);
+          setCustomers(
+            customersData.customers || []
+          );
         }
 
         const bill = billData.bill;
 
-        setInvoiceNumber(String(bill.invoiceNumber));
+        // Invoice Number
+        setInvoiceNumber(
+          String(bill.invoiceNumber)
+        );
 
+        // Bill Date
         if (bill.date) {
           setBillDate(
             new Date(bill.date)
               .toISOString()
               .split("T")[0]
           );
+        } else {
+          setBillDate("");
         }
 
-        // Customer
+        // Due Date
+        if (bill.dueDate) {
+          setDueDate(
+            new Date(bill.dueDate)
+              .toISOString()
+              .split("T")[0]
+          );
+        } else {
+          setDueDate("");
+        }
+
+        // Customer ID
         const customerId =
           typeof bill.customer === "string"
             ? bill.customer
             : bill.customer?._id;
 
-        const customerName =
-          typeof bill.customer === "object"
-            ? bill.customer?.name
-            : "";
+        // Customer Name
+        let customerName = "";
 
-        setSelectedCustomerId(customerId || "");
-        setCustomerSearch(customerName);
+        if (typeof bill.customer === "object") {
+          customerName =
+            bill.customer?.name || "";
+        } else {
+          // Find customer name if only ID is returned
+          const foundCustomer =
+            customersData.customers?.find(
+              (customer: Customer) =>
+                customer._id === bill.customer
+            );
+
+          customerName =
+            foundCustomer?.name || "";
+        }
+
+        setSelectedCustomerId(
+          customerId || ""
+        );
+
+        setCustomerSearch(
+          customerName
+        );
 
         // Items
         setItems(
@@ -130,17 +167,26 @@ export default function EditBillPage() {
               id:
                 Date.now() +
                 Math.random(),
-              model: item.modelNumber,
-              qty: item.quantity,
-              rate: item.rate,
+              model:
+                item.modelNumber || "",
+              qty:
+                item.quantity ?? "",
+              rate:
+                item.rate ?? "",
               discount:
-                item.discount || "",
+                item.discount ?? "",
             })
           )
         );
       } catch (error) {
-        console.error(error);
-        toast.error("Failed to load bill");
+        console.error(
+          "Fetch bill error:",
+          error
+        );
+
+        toast.error(
+          "Failed to load bill"
+        );
       } finally {
         setLoading(false);
       }

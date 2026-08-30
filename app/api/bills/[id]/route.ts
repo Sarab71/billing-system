@@ -145,16 +145,32 @@ export async function PUT(
     const updatedBill = await Bill.findByIdAndUpdate(
       id,
       {
-        ...(invoiceNumber !== undefined && { invoiceNumber }),
-        ...(customer !== undefined && { customer }),
-        ...(date !== undefined && { date: new Date(date) }),
-        ...(items !== undefined && { items }),
-        ...(totalQty !== undefined && { totalQty }),
+        ...(invoiceNumber !== undefined && {
+          invoiceNumber,
+        }),
+
+        ...(customer !== undefined && {
+          customer,
+        }),
+
+        ...(date !== undefined && {
+          date: new Date(date),
+        }),
+
+        ...(items !== undefined && {
+          items,
+        }),
+
+        ...(totalQty !== undefined && {
+          totalQty,
+        }),
+
         ...(grandTotal !== undefined && {
           grandTotal: Number(grandTotal),
         }),
+
         ...(dueDate !== undefined && {
-          dueDate: new Date(dueDate),
+          dueDate: dueDate ? new Date(dueDate) : null,
         }),
       },
       {
@@ -179,11 +195,10 @@ export async function PUT(
           date !== undefined
             ? new Date(date)
             : oldBill.date,
-        description: `Bill #${
-          invoiceNumber !== undefined
+        description: `Bill #${invoiceNumber !== undefined
             ? invoiceNumber
             : oldBill.invoiceNumber
-        } updated`,
+          } updated`,
       }
     );
 
