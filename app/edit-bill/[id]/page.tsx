@@ -57,6 +57,7 @@ export default function EditBillPage() {
   ]);
   const [activeCustomerIndex, setActiveCustomerIndex] = useState(-1);
   const [deleting, setDeleting] = useState(false);
+  const [dueDate, setDueDate] = useState("");
 
   // Fetch bill and customers
   useEffect(() => {
@@ -310,7 +311,7 @@ export default function EditBillPage() {
             items: billItems,
             totalQty: totalQuantity,
             grandTotal,
-            dueDate: billDate,
+            dueDate: dueDate || null,
           }),
         }
       );
@@ -456,7 +457,7 @@ export default function EditBillPage() {
             className="mt-5 space-y-5"
           >
             {/* Invoice and Date */}
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-3">
 
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gray-700">
@@ -466,6 +467,10 @@ export default function EditBillPage() {
                 <input
                   type="number"
                   value={invoiceNumber}
+                  onWheel={(e) => {
+                    e.currentTarget.blur();
+                  }}
+
                   onChange={(e) =>
                     setInvoiceNumber(
                       e.target.value
@@ -494,6 +499,31 @@ export default function EditBillPage() {
 
                   <Calendar
                     size={16}
+                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="dueDate"
+                  className="mb-1.5 block text-sm font-medium text-gray-700"
+                >
+                  Due Date
+                </label>
+
+                <div className="relative">
+                  <input
+                    id="dueDate"
+                    type="date"
+                    value={dueDate}
+                    min={billDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                    className="cursor-pointer w-full rounded-md border border-gray-300 px-3 py-2 pr-10 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  />
+
+                  <Calendar
+                    size={17}
                     className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
                   />
                 </div>
@@ -576,7 +606,7 @@ export default function EditBillPage() {
                           handleSelectCustomer(customer);
                           setActiveCustomerIndex(-1);
                         }}
-                        className={`block w-full px-3 py-2 text-left text-sm ${activeCustomerIndex === index
+                        className={`cursor-pointer block w-full px-3 py-2 text-left text-sm ${activeCustomerIndex === index
                           ? "bg-blue-100 text-blue-900"
                           : "hover:bg-gray-100"
                           }`}
@@ -599,7 +629,7 @@ export default function EditBillPage() {
                 <button
                   type="button"
                   onClick={addItem}
-                  className="flex items-center gap-1 rounded-md bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
+                  className="cursor-pointer flex items-center gap-1 rounded-md bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
                 >
                   <Plus size={16} />
                   Add Item
@@ -619,16 +649,13 @@ export default function EditBillPage() {
                           Model Number
                         </label>
 
-                        <input
+                        <textarea
                           value={item.model}
                           onChange={(e) =>
-                            updateItem(
-                              item.id,
-                              "model",
-                              e.target.value
-                            )
+                            updateItem(item.id, "model", e.target.value)
                           }
-                          className="w-full rounded-md border border-gray-300 px-2.5 py-2 text-sm outline-none focus:border-blue-500"
+                          rows={3}
+                          className="w-full resize-none rounded border border-gray-300 px-2 py-1.5 text-sm outline-none focus:border-blue-500"
                         />
                       </div>
 
@@ -641,6 +668,10 @@ export default function EditBillPage() {
                         <input
                           type="number"
                           value={item.qty}
+                          onWheel={(e) => {
+                            e.currentTarget.blur();
+                          }}
+
                           onChange={(e) =>
                             updateItem(
                               item.id,
@@ -661,6 +692,10 @@ export default function EditBillPage() {
                         <input
                           type="number"
                           value={item.rate}
+                          onWheel={(e) => {
+                            e.currentTarget.blur();
+                          }}
+
                           onChange={(e) =>
                             updateItem(
                               item.id,
@@ -681,6 +716,10 @@ export default function EditBillPage() {
                         <input
                           type="number"
                           value={item.discount}
+                          onWheel={(e) => {
+                            e.currentTarget.blur();
+                          }}
+
                           onChange={(e) =>
                             updateItem(
                               item.id,
@@ -699,7 +738,7 @@ export default function EditBillPage() {
                           onClick={() =>
                             removeItem(item.id)
                           }
-                          className="flex h-9 w-full items-center justify-center rounded-md bg-red-50 text-red-600 hover:bg-red-100"
+                          className="cursor-pointer flex h-9 w-full items-center justify-center rounded-md bg-red-50 text-red-600 hover:bg-red-100"
                         >
                           <Trash2 size={17} />
                         </button>
@@ -756,7 +795,7 @@ export default function EditBillPage() {
               <button
                 type="submit"
                 disabled={updating || deleting}
-                className="rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white"
+                className="cursor-pointer rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white"
               >
                 {updating ? "Updating..." : "Update Bill"}
               </button>
@@ -765,7 +804,7 @@ export default function EditBillPage() {
                 type="button"
                 onClick={handleDeleteBill}
                 disabled={deleting || updating}
-                className="rounded-md bg-red-600 px-5 py-2.5 text-sm font-medium text-white"
+                className="cursor-pointer rounded-md bg-red-600 px-5 py-2.5 text-sm font-medium text-white"
               >
                 {deleting ? "Deleting..." : "Delete Bill"}
               </button>
@@ -774,7 +813,7 @@ export default function EditBillPage() {
                 type="button"
                 onClick={() => router.back()}
                 disabled={updating || deleting}
-                className="rounded-md border border-gray-300 px-5 py-2.5 text-sm"
+                className="cursor-pointer rounded-md border border-gray-300 px-5 py-2.5 text-sm"
               >
                 Cancel
               </button>

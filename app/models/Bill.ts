@@ -91,7 +91,7 @@ const BillSchema = new Schema<IBill>({
 
   dueDate: {
     type: Date,
-    required: true,
+    default: null,
   },
 });
 
