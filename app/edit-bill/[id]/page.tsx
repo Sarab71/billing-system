@@ -513,15 +513,10 @@ export default function EditBillPage() {
                 <input
                   type="number"
                   value={invoiceNumber}
+                  readOnly
                   onWheel={(e) => {
                     e.currentTarget.blur();
                   }}
-
-                  onChange={(e) =>
-                    setInvoiceNumber(
-                      e.target.value
-                    )
-                  }
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
                 />
               </div>
