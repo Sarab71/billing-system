@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import CustomerSidebar from "../components/CustomerSidebar";
 import { generateStatementPdf } from "../utils/pdf/statementPdf";
+import EditCustomerForm from "../components/EditCustomerForm";
 
 interface Customer {
     _id: string;
@@ -58,6 +59,7 @@ export default function CustomersPage() {
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState(getToday());
 
+    const [editingCustomer, setEditingCustomer] = useState(false);
     const router = useRouter();
 
     const handleDownloadPDF = async () => {
@@ -194,11 +196,27 @@ export default function CustomersPage() {
                 {/* RIGHT SIDE */}
                 <main className="min-w-0 flex-1 p-2 sm:p-4 lg:p-6">
                     {!selectedCustomer ? (
-                        <div className="flex min-h-[calc(100vh-64px)] items-center justify-center p-3">
-                            <p className="text-center text-xs text-gray-500 sm:text-sm">
+                        <div className="flex h-full items-center justify-center">
+                            <p className="text-sm text-gray-500">
                                 Select a customer to view details
                             </p>
                         </div>
+                    ) : editingCustomer ? (
+                        <EditCustomerForm
+                            customer={selectedCustomer}
+                            onClose={() => setEditingCustomer(false)}
+                            onUpdated={(updatedCustomer) => {
+                                setSelectedCustomer(updatedCustomer);
+
+                                setCustomers((previousCustomers) =>
+                                    previousCustomers.map((customer) =>
+                                        customer._id === updatedCustomer._id
+                                            ? updatedCustomer
+                                            : customer
+                                    )
+                                );
+                            }}
+                        />
                     ) : (
                         <div className="mx-auto max-w-7xl">
 
@@ -209,14 +227,10 @@ export default function CustomersPage() {
                                 </h1>
 
                                 <button
-                                    type="button"
-                                    onClick={() =>
-                                        toast.info("Edit customer feature coming soon")
-                                    }
-                                    className="flex shrink-0 cursor-pointer items-center gap-1 rounded-md bg-blue-600 px-2 py-1.5 text-xs font-medium text-white transition hover:bg-blue-700 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm"
+                                    onClick={() => setEditingCustomer(true)}
+                                    className="cursor-pointer flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
                                 >
-                                    <Edit size={14} className="sm:hidden" />
-                                    <Edit size={16} className="hidden sm:block" />
+                                    <Edit size={16} />
                                     Edit
                                 </button>
                             </div>
