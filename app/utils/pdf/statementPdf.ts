@@ -21,6 +21,8 @@ export interface StatementTransaction {
 interface GenerateStatementPdfProps {
   customer: StatementCustomer;
   transactions: StatementTransaction[];
+  startDate?: string;
+  endDate?: string;
 }
 
 const loadFont = async (doc: jsPDF) => {
@@ -53,9 +55,17 @@ const loadFont = async (doc: jsPDF) => {
   doc.setFont("NotoSans");
 };
 
+const formatDate = (date?: string) => {
+  if (!date) return null;
+
+  return new Date(date).toLocaleDateString("en-IN");
+};
+
 export const generateStatementPdf = async ({
   customer,
   transactions,
+  startDate,
+  endDate,
 }: GenerateStatementPdfProps) => {
   const doc = new jsPDF();
 
@@ -70,6 +80,30 @@ export const generateStatementPdf = async ({
   doc.text("Customer Statement", 14, 18);
 
   // =====================
+  // STATEMENT PERIOD
+  // =====================
+
+  doc.setFontSize(10);
+
+  let statementPeriod = "Statement Period: All Transactions";
+
+  if (startDate && endDate) {
+    statementPeriod = `Statement Period: ${formatDate(
+      startDate
+    )} to ${formatDate(endDate)}`;
+  } else if (startDate) {
+    statementPeriod = `Statement Period: From ${formatDate(
+      startDate
+    )}`;
+  } else if (endDate) {
+    statementPeriod = `Statement Period: Until ${formatDate(
+      endDate
+    )}`;
+  }
+
+  doc.text(statementPeriod, 14, 25);
+
+  // =====================
   // CUSTOMER DETAILS
   // =====================
 
@@ -78,13 +112,13 @@ export const generateStatementPdf = async ({
   doc.text(
     `Customer: ${customer.name}`,
     14,
-    30
+    35
   );
 
   doc.text(
     `Phone: ${customer.phone || "-"}`,
     14,
-    37
+    42
   );
 
   const addressLines = doc.splitTextToSize(
@@ -92,11 +126,13 @@ export const generateStatementPdf = async ({
     120
   );
 
-  doc.text(addressLines, 14, 44);
+  doc.text(addressLines, 14, 49);
 
   // =====================
   // CURRENT BALANCE
   // =====================
+
+  const balanceY = 49 + addressLines.length * 6 + 8;
 
   doc.setFontSize(12);
 
@@ -108,7 +144,7 @@ export const generateStatementPdf = async ({
       maximumFractionDigits: 2,
     })}`,
     14,
-    58
+    balanceY
   );
 
   // =====================
@@ -164,7 +200,7 @@ export const generateStatementPdf = async ({
   // =====================
 
   autoTable(doc, {
-    startY: 66,
+    startY: balanceY + 8,
 
     head: [
       [
@@ -196,6 +232,9 @@ export const generateStatementPdf = async ({
   // =====================
 
   doc.save(
-    `${customer.name.replace(/\s+/g, "-")}-statement.pdf`
+    `${customer.name.replace(
+      /\s+/g,
+      "-"
+    )}-statement.pdf`
   );
 };

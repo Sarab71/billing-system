@@ -72,6 +72,8 @@ export default function CustomersPage() {
             await generateStatementPdf({
                 customer: selectedCustomer,
                 transactions,
+                startDate,
+                endDate,
             });
 
             toast.success("Statement downloaded successfully!");
