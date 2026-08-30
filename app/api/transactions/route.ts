@@ -4,21 +4,58 @@ import Transaction from "@/app/models/Transactions";
 import Customer from "@/app/models/Customer";
 
 // GET ALL TRANSACTIONS
-export async function GET() {
+// GET TRANSACTIONS
+export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    const transactions = await Transaction.find()
+    const { searchParams } = new URL(request.url);
+
+    const customerId = searchParams.get("customerId");
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
+
+    const query: Record<string, unknown> = {};
+
+    // Customer filter
+    if (customerId) {
+      query.customer = customerId;
+    }
+
+    // Date filter
+    if (startDate || endDate) {
+      const dateFilter: {
+        $gte?: Date;
+        $lte?: Date;
+      } = {};
+
+      if (startDate) {
+        dateFilter.$gte = new Date(`${startDate}T00:00:00.000Z`);
+      }
+
+      if (endDate) {
+        dateFilter.$lte = new Date(`${endDate}T23:59:59.999Z`);
+      }
+
+      query.date = dateFilter;
+    }
+
+    const transactions = await Transaction.find(query)
       .populate("customer")
       .populate("relatedBill")
-      .sort({ date: -1, createdAt: -1 });
+      .sort({
+        date: 1,
+        createdAt: 1,
+      });
 
     return NextResponse.json(
       {
         success: true,
         transactions,
       },
-      { status: 200 }
+      {
+        status: 200,
+      }
     );
   } catch (error) {
     console.error("GET transactions error:", error);
@@ -28,7 +65,9 @@ export async function GET() {
         success: false,
         message: "Failed to fetch transactions",
       },
-      { status: 500 }
+      {
+        status: 500,
+      }
     );
   }
 }

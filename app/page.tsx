@@ -125,7 +125,7 @@ export default function Home() {
             </div>
 
             {/* Date Filters */}
-            <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <div className="mt-8 flex flex-col items-end justify-center gap-4 sm:flex-row">
               {/* Start Date */}
               <div className="w-full sm:w-auto">
                 <label className="mb-2 block text-sm font-medium text-gray-600">
@@ -170,6 +170,19 @@ export default function Home() {
                   />
                 </div>
               </div>
+
+              {/* Clear Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setStartDate("");
+                  setEndDate(getToday());
+                }}
+                disabled={!startDate && endDate === getToday()}
+                className="w-full cursor-pointer rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+              >
+                Clear
+              </button>
             </div>
 
             {/* Dashboard Cards */}

@@ -54,6 +54,8 @@ export default function ExpensesPage() {
   const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(-1);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loadingExpenses, setLoadingExpenses] = useState(true);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState(getToday());
   // Edit Category
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
   const [editingCategoryName, setEditingCategoryName] = useState("");
@@ -210,7 +212,23 @@ export default function ExpensesPage() {
     try {
       setLoadingExpenses(true);
 
-      const response = await fetch("/api/expenses");
+      const params = new URLSearchParams();
+
+      if (startDate) {
+        params.append("startDate", startDate);
+      }
+
+      if (endDate) {
+        params.append("endDate", endDate);
+      }
+
+      const url =
+        params.toString()
+          ? `/api/expenses?${params.toString()}`
+          : "/api/expenses";
+
+      const response = await fetch(url);
+
       const data = await response.json();
 
       if (!response.ok || !data.success) {
@@ -231,8 +249,11 @@ export default function ExpensesPage() {
 
   useEffect(() => {
     fetchCategories();
-    fetchExpenses();
   }, []);
+
+  useEffect(() => {
+    fetchExpenses();
+  }, [startDate, endDate]);
 
   const filteredCategories = categories.filter((category) =>
     category.name
@@ -877,15 +898,78 @@ export default function ExpensesPage() {
       </div>
 
       {/* All Expenses */}
-      {/* All Expenses */}
-      <section className="mx-auto mt-6 max-w-5xl">
 
+      <section className="mx-auto mt-6 max-w-5xl">
         {/* Main Header */}
         <div className="mb-5 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-semibold text-gray-900">
               All Expenses
             </h2>
+            {/* DATE FILTERS */}
+            <div className="mb-5 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+
+                {/* Start Date */}
+                <div className="w-full sm:w-auto">
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                    Start Date
+                  </label>
+
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={startDate}
+                      max={endDate || undefined}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="w-full cursor-pointer rounded-md border border-gray-300 py-2.5 pr-10 pl-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:w-56"
+                    />
+
+                    <Calendar
+                      size={17}
+                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    />
+                  </div>
+                </div>
+
+                {/* End Date */}
+                <div className="w-full sm:w-auto">
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                    End Date
+                  </label>
+
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={endDate}
+                      min={startDate || undefined}
+                      max={getToday()}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="w-full cursor-pointer rounded-md border border-gray-300 py-2.5 pr-10 pl-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:w-56"
+                    />
+
+                    <Calendar
+                      size={17}
+                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    />
+                  </div>
+                </div>
+
+                {/* Clear Filter */}
+                {(startDate || endDate) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStartDate("");
+                      setEndDate(getToday());
+                    }}
+                    className="cursor-pointer rounded-md border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+            </div>
 
             <p className="mt-1 text-sm text-gray-500">
               Expenses grouped by category

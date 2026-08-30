@@ -243,7 +243,7 @@ export default function CustomersPage() {
                                 </h2>
 
                                 {/* DATE FILTERS */}
-                                <div className="mt-3 flex flex-col gap-2 sm:mt-5 sm:flex-row sm:gap-3">
+                                <div className="mt-3 flex flex-col gap-2 sm:mt-5 sm:flex-row sm:items-end sm:gap-3">
 
                                     {/* START DATE */}
                                     <div className="min-w-0 flex-1 sm:flex-none">
@@ -255,9 +255,8 @@ export default function CustomersPage() {
                                             <input
                                                 type="date"
                                                 value={startDate}
-                                                onChange={(e) =>
-                                                    setStartDate(e.target.value)
-                                                }
+                                                max={endDate || undefined}
+                                                onChange={(e) => setStartDate(e.target.value)}
                                                 className="w-full rounded-md border border-gray-300 px-2 py-1.5 pr-8 text-xs text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:w-56 sm:px-3 sm:py-2 sm:pr-9 sm:text-sm"
                                             />
 
@@ -278,9 +277,9 @@ export default function CustomersPage() {
                                             <input
                                                 type="date"
                                                 value={endDate}
-                                                onChange={(e) =>
-                                                    setEndDate(e.target.value)
-                                                }
+                                                min={startDate || undefined}
+                                                max={getToday()}
+                                                onChange={(e) => setEndDate(e.target.value)}
                                                 className="w-full rounded-md border border-gray-300 px-2 py-1.5 pr-8 text-xs text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:w-56 sm:px-3 sm:py-2 sm:pr-9 sm:text-sm"
                                             />
 
@@ -290,6 +289,20 @@ export default function CustomersPage() {
                                             />
                                         </div>
                                     </div>
+
+                                    {/* CLEAR FILTER */}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setStartDate("");
+                                            setEndDate("");
+                                        }}
+                                        disabled={!startDate && !endDate}
+                                        className="cursor-pointer rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:py-2 sm:text-sm"
+                                    >
+                                        Clear
+                                    </button>
+
                                 </div>
 
                                 {/* TABLE */}

@@ -3,11 +3,36 @@ import { connectDB } from "@/app/lib/mongodb";
 import Expense from "@/app/models/Expense";
 
 // GET all expenses
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    const expenses = await Expense.find()
+    const { searchParams } = new URL(request.url);
+
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
+
+    const filter: Record<string, unknown> = {};
+
+    // Date filter
+    if (startDate || endDate) {
+      const dateFilter: {
+        $gte?: Date;
+        $lte?: Date;
+      } = {};
+
+      if (startDate) {
+        dateFilter.$gte = new Date(`${startDate}T00:00:00.000Z`);
+      }
+
+      if (endDate) {
+        dateFilter.$lte = new Date(`${endDate}T23:59:59.999Z`);
+      }
+
+      filter.date = dateFilter;
+    }
+
+    const expenses = await Expense.find(filter)
       .populate("categoryId", "name")
       .sort({
         date: -1,
