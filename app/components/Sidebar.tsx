@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { CalendarDays, IndianRupee } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -10,39 +10,62 @@ interface DueBill {
   grandTotal: number;
   dueDate: string;
   customer:
-  | string
-  | {
-    _id: string;
-    name: string;
-    phone?: string;
-  };
+    | string
+    | {
+        _id: string;
+        name: string;
+        phone?: string;
+      };
 }
 
 export default function Sidebar() {
   const [bills, setBills] = useState<DueBill[]>([]);
   const [loading, setLoading] = useState(true);
+
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchDueBills = async () => {
-      try {
-        setLoading(true);
+  const fetchDueBills = useCallback(async () => {
+    try {
+      setLoading(true);
 
-        const response = await fetch("/api/bills/due");
-        const data = await response.json();
+      const response = await fetch("/api/bills/due", {
+        cache: "no-store",
+      });
 
-        if (response.ok && data.success) {
-          setBills(data.bills || []);
-        }
-      } catch (error) {
-        console.error("Fetch due bills error:", error);
-      } finally {
-        setLoading(false);
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setBills(data.bills || []);
+      } else {
+        setBills([]);
+        console.error(
+          data.message || "Failed to fetch due bills"
+        );
       }
+    } catch (error) {
+      console.error("Fetch due bills error:", error);
+      setBills([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDueBills();
+
+    const handleFocus = () => {
+      fetchDueBills();
     };
 
-    fetchDueBills();
-  }, []);
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener(
+        "focus",
+        handleFocus
+      );
+    };
+  }, [fetchDueBills]);
 
   return (
     <aside className="w-full border-b border-gray-200 bg-white lg:min-h-[calc(100vh-64px)] lg:w-72 lg:border-r lg:border-b-0">
@@ -102,7 +125,9 @@ export default function Sidebar() {
                 <button
                   key={bill._id}
                   type="button"
-                  onClick={() => router.push(`/edit-bill/${bill._id}`)}
+                  onClick={() =>
+                    router.push(`/edit-bill/${bill._id}`)
+                  }
                   className="w-full cursor-pointer rounded-lg border border-gray-200 bg-white p-3 text-left transition hover:border-blue-200 hover:bg-blue-50"
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -122,6 +147,7 @@ export default function Sidebar() {
 
                     <span className="flex items-center text-sm font-semibold text-red-600">
                       <IndianRupee size={13} />
+
                       {Number(
                         bill.grandTotal
                       ).toLocaleString("en-IN")}
