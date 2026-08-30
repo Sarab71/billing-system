@@ -421,7 +421,7 @@ export default function SalesPage() {
                                                                     `/edit-bill/${bill._id}`
                                                                 )
                                                             }
-                                                            className="inline-flex items-center gap-1.5 rounded-md bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-600 transition hover:bg-blue-100"
+                                                            className="cursor-pointer inline-flex items-center gap-1.5 rounded-md bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-600 transition hover:bg-blue-100"
                                                         >
                                                             <Eye size={15} />
                                                             View / Edit
