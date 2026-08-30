@@ -1,69 +1,257 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
+import Sidebar from "@/app/components/Sidebar";
+import { useRouter } from "next/navigation";
+import DashboardCard from "@/app/components/DashboardCard";
+import {
+  Wallet,
+  CircleDollarSign,
+  TrendingUp,
+  ReceiptIndianRupee,
+  Calendar,
+} from "lucide-react";
+
+interface DashboardData {
+  totalPayments: number;
+  totalSales: number;
+  totalExpenses: number;
+}
+
+const formatCurrency = (amount: number) => {
+  return `₹${amount.toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 2, })}`;
+};
+
+const getToday = () => {
+  return new Date().toISOString().split("T")[0];
+};
+
+const getFirstDayOfMonth = () => {
+  const date = new Date();
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+
+  return `${year}-${month}-01`;
+};
 
 export default function Home() {
+  const [startDate, setStartDate] = useState(getFirstDayOfMonth());
+  const [endDate, setEndDate] = useState(getToday());
+
+  const [dashboard, setDashboard] = useState<DashboardData>({
+    totalPayments: 0,
+    totalSales: 0,
+    totalExpenses: 0,
+  });
+
+  const [loading, setLoading] = useState(true);
+
+  const router = useRouter();
+
+  const fetchDashboard = async () => {
+    try {
+      setLoading(true);
+
+      const params = new URLSearchParams();
+
+      if (startDate) {
+        params.set("startDate", startDate);
+      }
+
+      if (endDate) {
+        params.set("endDate", endDate);
+      }
+
+      const response = await fetch(
+        `/api/dashboard?${params.toString()}`
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        console.error(
+          data.message || "Failed to fetch dashboard data"
+        );
+        return;
+      }
+
+      setDashboard({
+        totalPayments: Number(
+          data.dashboard.totalPayments || 0
+        ),
+        totalSales: Number(
+          data.dashboard.totalSales || 0
+        ),
+        totalExpenses: Number(
+          data.dashboard.totalExpenses || 0
+        ),
+      });
+    } catch (error) {
+      console.error("Dashboard fetch error:", error);
+    } finally {
+      setLoading(false);
+    }
+
+  };
+
+  useEffect(() => {
+    fetchDashboard();
+  }, [startDate, endDate]);
+
+  const totalOutstanding = Math.max(
+    dashboard.totalSales - dashboard.totalPayments,
+    0
+  );
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="min-h-[calc(100vh-64px)] bg-gray-50">
+      <div className="flex flex-col lg:flex-row">
+        {/* Today's Due Sidebar */}
+        <Sidebar />
+
+        {/* Main Dashboard */}
+        <main className="flex-1 p-5 sm:p-8">
+          <div className="mx-auto max-w-7xl">
+            {/* Welcome Section */}
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-gray-800 sm:text-3xl">
+                Welcome to Billing System
+              </h1>
+
+              <p className="mt-2 text-sm text-gray-500 sm:text-base">
+                Manage your customers, bills, payments and expenses
+              </p>
+            </div>
+
+            {/* Date Filters */}
+            <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              {/* Start Date */}
+              <div className="w-full sm:w-auto">
+                <label className="mb-2 block text-sm font-medium text-gray-600">
+                  Start Date
+                </label>
+
+                <div className="relative">
+                  <Calendar
+                    size={18}
+                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
+
+                  <input
+                    type="date"
+                    value={startDate}
+                    max={endDate || undefined}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pr-3 pl-10 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:w-56"
+                  />
+                </div>
+              </div>
+
+              {/* End Date */}
+              <div className="w-full sm:w-auto">
+                <label className="mb-2 block text-sm font-medium text-gray-600">
+                  End Date
+                </label>
+
+                <div className="relative">
+                  <Calendar
+                    size={18}
+                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
+
+                  <input
+                    type="date"
+                    value={endDate}
+                    min={startDate || undefined}
+                    max={getToday()}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pr-3 pl-10 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:w-56"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Dashboard Cards */}
+            <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+              <DashboardCard
+                title="Total Outstanding"
+                value={
+                  loading
+                    ? "Loading..."
+                    : formatCurrency(totalOutstanding)
+                }
+                subtitle="Sales minus payments received"
+                onClick={() => router.push("/outstanding")}
+                icon={<Wallet size={23} className="text-blue-600" />}
+              />
+
+              <DashboardCard
+                title="Payments Received"
+                value={
+                  loading
+                    ? "Loading..."
+                    : formatCurrency(dashboard.totalPayments)
+                }
+                subtitle="Payments received in selected period"
+                onClick={() => router.push("/payments")}
+                icon={
+                  <CircleDollarSign
+                    size={23}
+                    className="text-green-600"
+                  />
+                }
+              />
+
+              <DashboardCard
+                title="Total Sales"
+                value={
+                  loading
+                    ? "Loading..."
+                    : formatCurrency(dashboard.totalSales)
+                }
+                subtitle="Total sales in selected period"
+                onClick={() => router.push("/sales")}
+                icon={
+                  <TrendingUp
+                    size={23}
+                    className="text-purple-600"
+                  />
+                }
+              />
+
+              <DashboardCard
+                title="Expenses"
+                value={
+                  loading
+                    ? "Loading..."
+                    : formatCurrency(dashboard.totalExpenses)
+                }
+                subtitle="Total expenses in selected period"
+                onClick={() => router.push("/expenses")}
+                icon={
+                  <ReceiptIndianRupee
+                    size={23}
+                    className="text-red-600"
+                  />
+                }
+              />
+            </div>
+
+            {/* Future Dashboard Section */}
+            <div className="mt-8 rounded-xl border border-dashed border-gray-200 bg-white p-8 text-center">
+              <h2 className="text-base font-semibold text-gray-700">
+                Business Overview
+              </h2>
+
+              <p className="mt-2 text-sm text-gray-400">
+                Sales reports and analytics will appear here.
+              </p>
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
+
   );
 }
