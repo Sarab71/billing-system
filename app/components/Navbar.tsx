@@ -11,7 +11,9 @@ import {
   Menu,
   X,
   User,
+  LogOut,
 } from "lucide-react";
+import { toast } from "sonner";
 
 const menuItems = [
   { name: "Home", icon: Home, href: "/" },
@@ -25,11 +27,32 @@ const menuItems = [
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        toast.error(data.message || "Logout failed");
+        return;
+      }
+
+      toast.success("Logged out successfully");
+
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Failed to logout");
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white shadow-sm">
       <nav className="mx-auto flex h-16 max-w-7xl items-center px-4 sm:px-6 lg:px-8">
-        
+
         {/* Logo */}
         <div className="flex flex-1 items-center">
           <a
@@ -59,6 +82,16 @@ export default function Navbar() {
               </a>
             );
           })}
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            title="Logout"
+            aria-label="Logout"
+            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-gray-600 transition hover:bg-red-50 hover:text-red-600"
+          >
+            <LogOut size={18} />
+          </button>
         </div>
 
         {/* Right Side */}
@@ -94,6 +127,16 @@ export default function Navbar() {
                 </a>
               );
             })}
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              title="Logout"
+              aria-label="Logout"
+              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg text-gray-600 transition hover:bg-red-50 hover:text-red-600"
+            >
+              <LogOut size={19} />
+            </button>
 
           </div>
         </div>

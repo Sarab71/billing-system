@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Calendar, Plus, X, Download } from "lucide-react";
 import { toast } from "sonner";
-import { generateInvoicePdf } from "../utils/pdf/invoicePdf";
+import { generateInvoicePdf } from "../../utils/pdf/invoicePdf";
 
 interface BillItem {
   id: number;
