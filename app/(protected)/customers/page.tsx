@@ -58,6 +58,7 @@ export default function CustomersPage() {
 
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState(getToday());
+    const [openingBalance, setOpeningBalance] = useState(0);
 
     const [editingCustomer, setEditingCustomer] = useState(false);
     const router = useRouter();
@@ -74,6 +75,7 @@ export default function CustomersPage() {
                 transactions,
                 startDate,
                 endDate,
+                openingBalance,
             });
 
             toast.success("Statement downloaded successfully!");
@@ -142,15 +144,26 @@ export default function CustomersPage() {
 
             if (!response.ok || !data.success) {
                 toast.error(
-                    data.message || "Failed to fetch customer statement"
+                    data.message ||
+                    "Failed to fetch customer statement"
                 );
                 return;
             }
 
             setTransactions(data.transactions || []);
+
+            setOpeningBalance(
+                Number(data.openingBalance) || 0
+            );
         } catch (error) {
-            console.error("Fetch statement error:", error);
-            toast.error("Failed to fetch customer statement");
+            console.error(
+                "Fetch statement error:",
+                error
+            );
+
+            toast.error(
+                "Failed to fetch customer statement"
+            );
         } finally {
             setLoadingStatement(false);
         }
@@ -163,15 +176,16 @@ export default function CustomersPage() {
     }, [selectedCustomer, startDate, endDate]);
 
     // Running balance
-    let runningBalance = 0;
+    // Running balance
+    let runningBalance = openingBalance;
 
     const statementRows = transactions.map((transaction) => {
         const amount = Number(transaction.amount) || 0;
 
         if (transaction.type === "debit") {
-            runningBalance -= amount;
-        } else {
             runningBalance += amount;
+        } else if (transaction.type === "credit") {
+            runningBalance -= amount;
         }
 
         return {
@@ -179,7 +193,6 @@ export default function CustomersPage() {
             runningBalance,
         };
     });
-
     return (
         <div className="min-h-[calc(100vh-64px)] bg-gray-50">
             <div className="flex min-h-[calc(100vh-64px)]">

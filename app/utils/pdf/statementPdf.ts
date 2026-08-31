@@ -23,10 +23,17 @@ interface GenerateStatementPdfProps {
   transactions: StatementTransaction[];
   startDate?: string;
   endDate?: string;
+  openingBalance?: number;
 }
 
+// ==================================================
+// LOAD FONT
+// ==================================================
+
 const loadFont = async (doc: jsPDF) => {
-  const response = await fetch("/fonts/NotoSans-Regular.ttf");
+  const response = await fetch(
+    "/fonts/NotoSans-Regular.ttf"
+  );
 
   if (!response.ok) {
     throw new Error("Failed to load font");
@@ -36,7 +43,8 @@ const loadFont = async (doc: jsPDF) => {
 
   const base64 = btoa(
     new Uint8Array(fontBuffer).reduce(
-      (data, byte) => data + String.fromCharCode(byte),
+      (data, byte) =>
+        data + String.fromCharCode(byte),
       ""
     )
   );
@@ -55,86 +63,198 @@ const loadFont = async (doc: jsPDF) => {
   doc.setFont("NotoSans");
 };
 
-const formatDate = (date?: string) => {
-  if (!date) return null;
+// ==================================================
+// FORMAT DATE
+// ==================================================
 
-  return new Date(date).toLocaleDateString("en-IN");
+const formatDate = (date?: string) => {
+  if (!date) return "";
+
+  return new Date(date).toLocaleDateString(
+    "en-IN",
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }
+  );
 };
+
+// ==================================================
+// GENERATE PDF
+// ==================================================
 
 export const generateStatementPdf = async ({
   customer,
   transactions,
   startDate,
   endDate,
+  openingBalance = 0,
 }: GenerateStatementPdfProps) => {
   const doc = new jsPDF();
 
   // Load ₹ supported font
   await loadFont(doc);
 
-  // =====================
-  // HEADING
-  // =====================
+  // ==================================================
+  // COMPANY DETAILS
+  // ==================================================
 
-  doc.setFontSize(18);
-  doc.text("Customer Statement", 14, 18);
+  const companyName = "ABC Company";
 
-  // =====================
-  // STATEMENT PERIOD
-  // =====================
+  // ==================================================
+  // TOP HEADER
+  // ==================================================
+
+  let y = 16;
+
+  // Company Name
+  doc.setFontSize(15);
+  doc.setFont(
+    "NotoSans",
+    "normal"
+  );
+
+  doc.text(
+    companyName,
+    105,
+    y,
+    {
+      align: "center",
+    }
+  );
+
+  y += 4;
+
+  // Horizontal line
+  doc.setLineWidth(0.5);
+
+  doc.line(
+    14,
+    y,
+    196,
+    y
+  );
+
+  y += 7;
+
+  // ==================================================
+  // CUSTOMER NAME
+  // ==================================================
+
+  y += 3;
+
+  doc.setFontSize(13);
+
+  doc.text(
+    customer.name,
+    105,
+    y,
+    {
+      align: "center",
+    }
+  );
+
+  // ==================================================
+  // CUSTOMER ADDRESS
+  // ==================================================
+
+  y += 6;
+
+  doc.setFontSize(9);
+
+  const addressLines =
+    doc.splitTextToSize(
+      customer.address || "-",
+      100
+    );
+
+  doc.text(
+    addressLines,
+    105,
+    y,
+    {
+      align: "center",
+    }
+  );
+
+  y += addressLines.length * 5;
+
+  // ==================================================
+  // STATEMENT TYPE
+  // ==================================================
 
   doc.setFontSize(10);
 
-  let statementPeriod = "Statement Period: All Transactions";
+  doc.text(
+    "Customer Statement",
+    105,
+    y,
+    {
+      align: "center",
+    }
+  );
+
+  // ==================================================
+  // STATEMENT PERIOD
+  // ==================================================
+
+  y += 7;
+
+  let statementPeriod =
+    "All Transactions";
 
   if (startDate && endDate) {
-    statementPeriod = `Statement Period: ${formatDate(
-      startDate
-    )} to ${formatDate(endDate)}`;
+    statementPeriod =
+      `${formatDate(startDate)} to ${formatDate(endDate)}`;
   } else if (startDate) {
-    statementPeriod = `Statement Period: From ${formatDate(
-      startDate
-    )}`;
+    statementPeriod =
+      `From ${formatDate(startDate)}`;
   } else if (endDate) {
-    statementPeriod = `Statement Period: Until ${formatDate(
-      endDate
-    )}`;
+    statementPeriod =
+      `Until ${formatDate(endDate)}`;
   }
 
-  doc.text(statementPeriod, 14, 25);
-
-  // =====================
-  // CUSTOMER DETAILS
-  // =====================
-
-  doc.setFontSize(11);
+  doc.setFontSize(9);
 
   doc.text(
-    `Customer: ${customer.name}`,
-    14,
-    35
+    statementPeriod,
+    105,
+    y,
+    {
+      align: "center",
+    }
   );
+
+  // ==================================================
+  // OPENING BALANCE
+  // ==================================================
+
+  y += 7;
+
+  doc.setFontSize(10);
 
   doc.text(
-    `Phone: ${customer.phone || "-"}`,
-    14,
-    42
+    `Opening Balance: ₹${Number(
+      openingBalance || 0
+    ).toLocaleString("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+    105,
+    y,
+    {
+      align: "center",
+    }
   );
 
-  const addressLines = doc.splitTextToSize(
-    `Address: ${customer.address || "-"}`,
-    120
-  );
-
-  doc.text(addressLines, 14, 49);
-
-  // =====================
+  // ==================================================
   // CURRENT BALANCE
-  // =====================
+  // ==================================================
 
-  const balanceY = 49 + addressLines.length * 6 + 8;
+  y += 7;
 
-  doc.setFontSize(12);
+  doc.setFontSize(10);
 
   doc.text(
     `Current Balance: ₹${Number(
@@ -143,64 +263,86 @@ export const generateStatementPdf = async ({
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`,
-    14,
-    balanceY
-  );
-
-  // =====================
-  // SORT TRANSACTIONS
-  // =====================
-
-  const sortedTransactions = [...transactions].sort(
-    (a, b) =>
-      new Date(a.date).getTime() -
-      new Date(b.date).getTime()
-  );
-
-  // =====================
-  // RUNNING BALANCE
-  // =====================
-
-  let runningBalance = 0;
-
-  const tableRows = sortedTransactions.map(
-    (transaction) => {
-      const amount = Number(transaction.amount) || 0;
-
-      if (transaction.type === "debit") {
-        runningBalance += amount;
-      } else if (transaction.type === "credit") {
-        runningBalance -= amount;
-      }
-
-      return [
-        new Date(
-          transaction.date
-        ).toLocaleDateString("en-IN"),
-
-        transaction.invoiceNumber
-          ? `Invoice #${transaction.invoiceNumber}`
-          : transaction.description || "Payment",
-
-        transaction.type === "debit"
-          ? `₹${amount.toLocaleString("en-IN")}`
-          : "-",
-
-        transaction.type === "credit"
-          ? `₹${amount.toLocaleString("en-IN")}`
-          : "-",
-
-        `₹${runningBalance.toLocaleString("en-IN")}`,
-      ];
+    105,
+    y,
+    {
+      align: "center",
     }
   );
 
-  // =====================
+  // ==================================================
+  // SORT TRANSACTIONS
+  // ==================================================
+
+  const sortedTransactions =
+    [...transactions].sort(
+      (a, b) =>
+        new Date(a.date).getTime() -
+        new Date(b.date).getTime()
+    );
+
+  // ==================================================
+  // RUNNING BALANCE
+  // ==================================================
+
+  let runningBalance =
+    Number(openingBalance) || 0;
+
+  const tableRows =
+    sortedTransactions.map(
+      (transaction) => {
+        const amount =
+          Number(transaction.amount) || 0;
+
+        if (
+          transaction.type === "debit"
+        ) {
+          runningBalance += amount;
+        } else if (
+          transaction.type === "credit"
+        ) {
+          runningBalance -= amount;
+        }
+
+        return [
+          new Date(
+            transaction.date
+          ).toLocaleDateString(
+            "en-IN"
+          ),
+
+          transaction.invoiceNumber
+            ? `Invoice #${transaction.invoiceNumber}`
+            : transaction.description ||
+              "Payment",
+
+          transaction.type ===
+          "debit"
+            ? `₹${amount.toLocaleString(
+                "en-IN"
+              )}`
+            : "-",
+
+          transaction.type ===
+          "credit"
+            ? `₹${amount.toLocaleString(
+                "en-IN"
+              )}`
+            : "-",
+
+          `₹${runningBalance.toLocaleString(
+            "en-IN"
+          )}`,
+        ];
+      }
+    );
+
+  // ==================================================
   // TABLE
-  // =====================
+  // ==================================================
 
   autoTable(doc, {
-    startY: balanceY + 8,
+    startY: y + 8,
 
     head: [
       [
@@ -225,11 +367,36 @@ export const generateStatementPdf = async ({
       font: "NotoSans",
       fontStyle: "normal",
     },
+
+    columnStyles: {
+      0: {
+        cellWidth: 28,
+      },
+
+      1: {
+        cellWidth: 65,
+      },
+
+      2: {
+        cellWidth: 30,
+        halign: "right",
+      },
+
+      3: {
+        cellWidth: 30,
+        halign: "right",
+      },
+
+      4: {
+        cellWidth: 32,
+        halign: "right",
+      },
+    },
   });
 
-  // =====================
+  // ==================================================
   // DOWNLOAD
-  // =====================
+  // ==================================================
 
   doc.save(
     `${customer.name.replace(

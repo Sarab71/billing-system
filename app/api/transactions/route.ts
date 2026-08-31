@@ -3,8 +3,10 @@ import { connectDB } from "@/app/lib/mongodb";
 import Transaction from "@/app/models/Transactions";
 import Customer from "@/app/models/Customer";
 
-// GET ALL TRANSACTIONS
+// ==================================================
 // GET TRANSACTIONS
+// ==================================================
+
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
@@ -15,32 +17,72 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
 
-    const query: Record<string, unknown> = {};
+    // ==================================================
+    // BASE FILTER
+    // ==================================================
 
-    // Customer filter
+    const filter: Record<string, unknown> = {};
+
     if (customerId) {
-      query.customer = customerId;
+      filter.customer = customerId;
     }
 
-    // Date filter
+    // ==================================================
+    // OPENING BALANCE
+    // ==================================================
+
+    let openingBalance = 0;
+
+    if (customerId && startDate) {
+      const start = new Date(startDate);
+
+      // Transactions BEFORE selected start date
+      const previousTransactions = await Transaction.find({
+        customer: customerId,
+        date: {
+          $lt: start,
+        },
+      }).select("type amount");
+
+      for (const transaction of previousTransactions) {
+        const amount = Number(transaction.amount) || 0;
+
+        if (transaction.type === "debit") {
+          openingBalance += amount;
+        } else if (transaction.type === "credit") {
+          openingBalance -= amount;
+        }
+      }
+    }
+
+    // ==================================================
+    // DATE FILTER
+    // ==================================================
+
     if (startDate || endDate) {
-      const dateFilter: {
-        $gte?: Date;
-        $lte?: Date;
-      } = {};
+      const dateFilter: Record<string, Date> = {};
 
       if (startDate) {
-        dateFilter.$gte = new Date(`${startDate}T00:00:00.000Z`);
+        dateFilter.$gte = new Date(startDate);
       }
 
       if (endDate) {
-        dateFilter.$lte = new Date(`${endDate}T23:59:59.999Z`);
+        const end = new Date(endDate);
+
+        // Include complete end date
+        end.setHours(23, 59, 59, 999);
+
+        dateFilter.$lte = end;
       }
 
-      query.date = dateFilter;
+      filter.date = dateFilter;
     }
 
-    const transactions = await Transaction.find(query)
+    // ==================================================
+    // FETCH TRANSACTIONS
+    // ==================================================
+
+    const transactions = await Transaction.find(filter)
       .populate("customer")
       .populate("relatedBill")
       .sort({
@@ -52,6 +94,7 @@ export async function GET(request: NextRequest) {
       {
         success: true,
         transactions,
+        openingBalance,
       },
       {
         status: 200,
@@ -72,7 +115,10 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// ==================================================
 // CREATE TRANSACTION / PAYMENT
+// ==================================================
+
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
@@ -95,7 +141,9 @@ export async function POST(request: NextRequest) {
           success: false,
           message: "Customer, type and amount are required",
         },
-        { status: 400 }
+        {
+          status: 400,
+        }
       );
     }
 
@@ -105,7 +153,9 @@ export async function POST(request: NextRequest) {
           success: false,
           message: "Type must be either debit or credit",
         },
-        { status: 400 }
+        {
+          status: 400,
+        }
       );
     }
 
@@ -115,11 +165,14 @@ export async function POST(request: NextRequest) {
           success: false,
           message: "Amount must be greater than 0",
         },
-        { status: 400 }
+        {
+          status: 400,
+        }
       );
     }
 
-    const existingCustomer = await Customer.findById(customer);
+    const existingCustomer =
+      await Customer.findById(customer);
 
     if (!existingCustomer) {
       return NextResponse.json(
@@ -127,7 +180,9 @@ export async function POST(request: NextRequest) {
           success: false,
           message: "Customer not found",
         },
-        { status: 404 }
+        {
+          status: 404,
+        }
       );
     }
 
@@ -141,7 +196,10 @@ export async function POST(request: NextRequest) {
       invoiceNumber: invoiceNumber ?? null,
     });
 
-    // Update customer balance
+    // ==================================================
+    // UPDATE CUSTOMER BALANCE
+    // ==================================================
+
     if (type === "debit") {
       existingCustomer.balance += Number(amount);
     } else {
@@ -156,7 +214,9 @@ export async function POST(request: NextRequest) {
         message: "Transaction created successfully",
         transaction,
       },
-      { status: 201 }
+      {
+        status: 201,
+      }
     );
   } catch (error) {
     console.error("POST transaction error:", error);
@@ -166,7 +226,9 @@ export async function POST(request: NextRequest) {
         success: false,
         message: "Failed to create transaction",
       },
-      { status: 500 }
+      {
+        status: 500,
+      }
     );
   }
 }
