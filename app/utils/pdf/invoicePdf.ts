@@ -72,7 +72,7 @@ const calculateItemTotal = (item: InvoiceItem) => {
   const discountAmount =
     (subtotal * discount) / 100;
 
-  return subtotal - discountAmount;
+  return Math.round(subtotal - discountAmount);
 };
 
 // ==================================================
@@ -167,86 +167,83 @@ export const generateInvoicePdf = async ({
   // ==================================================
 
   const leftX = 14;
+  const rightX = 196;
 
-  let leftY = 35;
+  let detailsY = 35;
 
   doc.setFontSize(8.5);
   doc.setFont("NotoSans", "normal");
 
-  // Phone
-  leftY += 6;
+  // --------------------------------------------------
+  // LEFT SIDE
+  // --------------------------------------------------
 
   doc.text(
     `Phone: ${companyPhone}`,
     leftX,
-    leftY
+    detailsY
   );
-
-  // Receipt Number
-  leftY += 6;
 
   doc.text(
     `Receipt #: ${invoiceNumber}`,
     leftX,
-    leftY
+    detailsY + 6
   );
-
-  // Date
-  leftY += 6;
 
   doc.text(
     `Date: ${formatDate(billDate)}`,
     leftX,
-    leftY
+    detailsY + 12
+  );
+
+  // --------------------------------------------------
+  // RIGHT SIDE - BILL TO
+  // --------------------------------------------------
+
+  doc.text(
+    "Bill To:",
+    rightX,
+    detailsY,
+    {
+      align: "right",
+    }
+  );
+
+  doc.text(
+    customer.name,
+    rightX,
+    detailsY + 4,
+    {
+      align: "right",
+    }
+  );
+
+  // Customer Address
+  const customerAddressLines = doc.splitTextToSize(
+    `Address:\n${customer.address || "-"}`,
+    90
+  );
+
+  doc.text(
+    customerAddressLines,
+    rightX,
+    detailsY + 12,
+    {
+      align: "right",
+    }
   );
 
   // ==================================================
-  // RIGHT SIDE - BILL TO
+  // HEADER BOTTOM POSITION
   // ==================================================
 
-  const rightX = 196;
-
-  let rightY = 35;
-
-  doc.setFontSize(8.5);
-  doc.setFont("NotoSans", "normal");
-
-  // Customer Name
-doc.text(
-  `Bill To:\n${customer.name}`,
-  rightX,
-  rightY,
-  {
-    align: "right",
-  }
-);
-
-// Customer Address
-rightY += 10;
-
-const customerAddressLines = doc.splitTextToSize(
-  `Address:\n${customer.address || "-"}`,
-  90
-);
-
-doc.text(
-  customerAddressLines,
-  rightX,
-  rightY,
-  {
-    align: "right",
-  }
-);
-
-  // ==================================================
-  // HORIZONTAL LINE
-  // ==================================================
+  const addressHeight =
+    customerAddressLines.length * 4;
 
   const headerBottomY =
     Math.max(
-      leftY,
-      rightY +
-      customerAddressLines.length * 4
+      detailsY + 12,
+      detailsY + 12 + addressHeight
     ) + 5;
 
   doc.setLineWidth(0.4);
@@ -303,12 +300,16 @@ doc.text(
       fontSize: 9,
       cellPadding: 3,
       lineWidth: 0.2,
+      halign: "center",
+      valign: "middle",
     },
 
     headStyles: {
       font: "NotoSans",
       fontStyle: "normal",
       fontSize: 9,
+      halign: "center",
+      valign: "middle",
     },
 
     columnStyles: {
@@ -319,6 +320,7 @@ doc.text(
 
       1: {
         cellWidth: 62,
+        halign: "center",
       },
 
       2: {
@@ -328,17 +330,17 @@ doc.text(
 
       3: {
         cellWidth: 30,
-        halign: "right",
+        halign: "center",
       },
 
       4: {
         cellWidth: 28,
-        halign: "right",
+        halign: "center",
       },
 
       5: {
         cellWidth: 35,
-        halign: "right",
+        halign: "center",
       },
     },
 

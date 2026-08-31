@@ -335,58 +335,64 @@ export const generateStatementPdf = async ({
   // TABLE
   // ==================================================
 
-  autoTable(doc, {
-    startY: y + 8,
+autoTable(doc, {
+  startY: y + 8,
 
-    head: [
-      [
-        "Date",
-        "Particulars",
-        "Debit",
-        "Credit",
-        "Balance",
-      ],
+  head: [
+    [
+      "Date",
+      "Particulars",
+      "Debit",
+      "Credit",
+      "Balance",
     ],
+  ],
 
-    body: tableRows,
+  body: tableRows,
 
-    styles: {
-      font: "NotoSans",
-      fontStyle: "normal",
-      fontSize: 9,
-      cellPadding: 3,
+  styles: {
+    font: "NotoSans",
+    fontStyle: "normal",
+    fontSize: 9,
+    cellPadding: 3,
+    halign: "center",
+    valign: "middle",
+  },
+
+  headStyles: {
+    font: "NotoSans",
+    fontStyle: "normal",
+    halign: "center",
+    valign: "middle",
+  },
+
+  columnStyles: {
+    0: {
+      cellWidth: 28,
+      halign: "center",
     },
 
-    headStyles: {
-      font: "NotoSans",
-      fontStyle: "normal",
+    1: {
+      cellWidth: 65,
+      halign: "center",
     },
 
-    columnStyles: {
-      0: {
-        cellWidth: 28,
-      },
-
-      1: {
-        cellWidth: 65,
-      },
-
-      2: {
-        cellWidth: 30,
-        halign: "right",
-      },
-
-      3: {
-        cellWidth: 30,
-        halign: "right",
-      },
-
-      4: {
-        cellWidth: 32,
-        halign: "right",
-      },
+    2: {
+      cellWidth: 30,
+      halign: "center",
     },
-  });
+
+    3: {
+      cellWidth: 30,
+      halign: "center",
+    },
+
+    4: {
+      cellWidth: 32,
+      halign: "center",
+    },
+  },
+});
 
   // ==================================================
   // DOWNLOAD

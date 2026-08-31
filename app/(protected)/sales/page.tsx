@@ -304,6 +304,14 @@ export default function SalesPage() {
             </div>
           </div>
 
+          {/* Result count */}
+          {!loading && filteredBills.length > 0 && (
+            <p className="my-3 text-xs text-gray-500 sm:text-sm">
+              Showing {filteredBills.length} sale
+              {filteredBills.length !== 1 ? "s" : ""}
+            </p>
+          )}
+
           {/* Sales Table */}
           <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
             <div className="overflow-x-auto">
@@ -431,8 +439,8 @@ export default function SalesPage() {
                                       <span
                                         key={index}
                                         className={`wrap-break-word text-xs sm:text-sm ${isMatched
-                                            ? "font-semibold text-blue-600"
-                                            : "text-gray-600"
+                                          ? "font-semibold text-blue-600"
+                                          : "text-gray-600"
                                           }`}
                                       >
                                         {item.modelNumber}
@@ -471,13 +479,6 @@ export default function SalesPage() {
             </div>
           </div>
 
-          {/* Result count */}
-          {!loading && filteredBills.length > 0 && (
-            <p className="mt-3 text-xs text-gray-500 sm:text-sm">
-              Showing {filteredBills.length} sale
-              {filteredBills.length !== 1 ? "s" : ""}
-            </p>
-          )}
         </div>
       </main>
     </div>

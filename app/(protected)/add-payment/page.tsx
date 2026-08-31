@@ -256,7 +256,7 @@ export default function AddPaymentPage() {
                             <span>{item.phone}</span>
 
                             <span>
-                              Balance: ₹{item.balance.toFixed(2)}
+                              Balance: ₹{item.balance}
                             </span>
                           </div>
                         </button>

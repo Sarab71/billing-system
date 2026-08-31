@@ -661,7 +661,7 @@ export default function CreateBillPage() {
                     </td>
 
                     <td className="border border-gray-300 px-2 py-1.5 text-center whitespace-nowrap">
-                      ₹{calculateItemTotal(item).toFixed(2)}
+                      ₹{calculateItemTotal(item)}
                     </td>
 
                     <td className="border border-gray-300 px-2 py-1 text-center">
