@@ -24,6 +24,10 @@ interface GenerateInvoicePdfProps {
   grandTotal: number;
 }
 
+// ==================================================
+// LOAD FONT
+// ==================================================
+
 const loadFont = async (doc: jsPDF) => {
   const response = await fetch("/fonts/NotoSans-Regular.ttf");
 
@@ -51,8 +55,12 @@ const loadFont = async (doc: jsPDF) => {
     "normal"
   );
 
-  doc.setFont("NotoSans");
+  doc.setFont("NotoSans", "normal");
 };
+
+// ==================================================
+// CALCULATE ITEM TOTAL
+// ==================================================
 
 const calculateItemTotal = (item: InvoiceItem) => {
   const qty = Number(item.qty) || 0;
@@ -60,10 +68,40 @@ const calculateItemTotal = (item: InvoiceItem) => {
   const discount = Number(item.discount) || 0;
 
   const subtotal = qty * rate;
-  const discountAmount = (subtotal * discount) / 100;
+
+  const discountAmount =
+    (subtotal * discount) / 100;
 
   return subtotal - discountAmount;
 };
+
+// ==================================================
+// FORMAT DATE
+// Example: 31/AUG/2026
+// ==================================================
+
+const formatDate = (date: string) => {
+  const parsedDate = new Date(date);
+
+  const day = String(
+    parsedDate.getDate()
+  ).padStart(2, "0");
+
+  const month = parsedDate.toLocaleDateString(
+    "en-US",
+    {
+      month: "short",
+    }
+  );
+
+  const year = parsedDate.getFullYear();
+
+  return `${day}/${month}/${year}`;
+};
+
+// ==================================================
+// GENERATE INVOICE PDF
+// ==================================================
 
 export const generateInvoicePdf = async ({
   invoiceNumber,
@@ -75,71 +113,180 @@ export const generateInvoicePdf = async ({
 }: GenerateInvoicePdfProps) => {
   const doc = new jsPDF();
 
-  // Load Unicode font for ₹ symbol
+  // Load ₹ supported font
   await loadFont(doc);
 
-  // =====================
+  // ==================================================
+  // COMPANY DETAILS
+  // ==================================================
+
+  const companyName = "VISION VAULT";
+  const companyPhone = "+91 9319747717";
+
+  // ==================================================
   // HEADER
-  // =====================
+  // ==================================================
+
+  let y = 13;
+
+  // --------------------------------------------------
+  // COMPANY NAME
+  // --------------------------------------------------
 
   doc.setFontSize(20);
-  doc.text("INVOICE", 14, 18);
-
-  doc.setFontSize(10);
-
-  doc.text(`Invoice No: ${invoiceNumber}`, 14, 30);
+  doc.setFont("NotoSans", "normal");
 
   doc.text(
-    `Date: ${new Date(billDate).toLocaleDateString("en-IN")}`,
-    14,
-    37
+    companyName,
+    105,
+    y,
+    {
+      align: "center",
+    }
   );
 
-  // =====================
-  // CUSTOMER
-  // =====================
+  // --------------------------------------------------
+  // RECEIPT
+  // --------------------------------------------------
 
-  doc.setFontSize(12);
-  doc.text("Bill To:", 14, 50);
+  y += 6;
 
-  doc.setFontSize(10);
+  doc.setFontSize(15);
 
   doc.text(
-    `Name: ${customer.name}`,
-    14,
-    57
+    "RECEIPT",
+    105,
+    y,
+    {
+      align: "center",
+    }
   );
+
+  // ==================================================
+  // LEFT SIDE - COMPANY / INVOICE DETAILS
+  // ==================================================
+
+  const leftX = 14;
+
+  let leftY = 35;
+
+  doc.setFontSize(8.5);
+  doc.setFont("NotoSans", "normal");
+
+  // Phone
+  leftY += 6;
 
   doc.text(
-    `Phone: ${customer.phone || "-"}`,
-    14,
-    64
+    `Phone: ${companyPhone}`,
+    leftX,
+    leftY
   );
 
-  if (customer.address) {
-    const addressLines = doc.splitTextToSize(
-      `Address: ${customer.address}`,
-      90
-    );
+  // Receipt Number
+  leftY += 6;
 
-    doc.text(addressLines, 14, 71);
+  doc.text(
+    `Receipt #: ${invoiceNumber}`,
+    leftX,
+    leftY
+  );
+
+  // Date
+  leftY += 6;
+
+  doc.text(
+    `Date: ${formatDate(billDate)}`,
+    leftX,
+    leftY
+  );
+
+  // ==================================================
+  // RIGHT SIDE - BILL TO
+  // ==================================================
+
+  const rightX = 196;
+
+  let rightY = 35;
+
+  doc.setFontSize(8.5);
+  doc.setFont("NotoSans", "normal");
+
+  // Customer Name
+doc.text(
+  `Bill To:\n${customer.name}`,
+  rightX,
+  rightY,
+  {
+    align: "right",
   }
+);
 
-  // =====================
-  // TABLE
-  // =====================
+// Customer Address
+rightY += 10;
 
-  const tableRows = items.map((item, index) => [
-    String(index + 1),
-    item.model,
-    String(item.qty),
-    `₹${Number(item.rate).toLocaleString("en-IN")}`,
-    `${Number(item.discount) || 0}%`,
-    `₹${calculateItemTotal(item).toLocaleString("en-IN")}`,
-  ]);
+const customerAddressLines = doc.splitTextToSize(
+  `Address:\n${customer.address || "-"}`,
+  90
+);
 
+doc.text(
+  customerAddressLines,
+  rightX,
+  rightY,
+  {
+    align: "right",
+  }
+);
+
+  // ==================================================
+  // HORIZONTAL LINE
+  // ==================================================
+
+  const headerBottomY =
+    Math.max(
+      leftY,
+      rightY +
+      customerAddressLines.length * 4
+    ) + 5;
+
+  doc.setLineWidth(0.4);
+
+  doc.line(
+    14,
+    headerBottomY,
+    196,
+    headerBottomY
+  );
+
+  // ==================================================
+  // ITEMS TABLE
+  // ==================================================
+
+  const tableRows = items.map(
+    (item, index) => [
+      String(index + 1),
+
+      item.model,
+
+      String(item.qty),
+
+      `₹${Number(
+        item.rate
+      ).toLocaleString("en-IN", {
+        maximumFractionDigits: 0,
+      })}`,
+
+      `${Number(item.discount) || 0}%`,
+
+      `₹${calculateItemTotal(
+        item
+      ).toLocaleString("en-IN", {
+        maximumFractionDigits: 0,
+      })}`,
+    ]
+  );
   autoTable(doc, {
-    startY: 85,
+    startY: headerBottomY + 6,
 
     head: [
       [
@@ -159,51 +306,118 @@ export const generateInvoicePdf = async ({
       fontStyle: "normal",
       fontSize: 9,
       cellPadding: 3,
+      lineWidth: 0.2,
     },
 
     headStyles: {
       font: "NotoSans",
       fontStyle: "normal",
+      fontSize: 9,
+    },
+
+    columnStyles: {
+      0: {
+        cellWidth: 12,
+        halign: "center",
+      },
+
+      1: {
+        cellWidth: 62,
+      },
+
+      2: {
+        cellWidth: 20,
+        halign: "center",
+      },
+
+      3: {
+        cellWidth: 30,
+        halign: "right",
+      },
+
+      4: {
+        cellWidth: 28,
+        halign: "right",
+      },
+
+      5: {
+        cellWidth: 35,
+        halign: "right",
+      },
+    },
+
+    margin: {
+      left: 14,
+      right: 14,
     },
   });
 
-  // =====================
+  // ==================================================
   // TOTALS
-  // =====================
+  // ==================================================
 
-  const finalY = (
-    doc as unknown as {
-      lastAutoTable: {
-        finalY: number;
-      };
-    }
-  ).lastAutoTable.finalY;
+  const finalY =
+    (
+      doc as unknown as {
+        lastAutoTable: {
+          finalY: number;
+        };
+      }
+    ).lastAutoTable.finalY;
 
+  // Total Quantity
   doc.setFontSize(10);
 
   doc.text(
     `Total Quantity: ${totalQuantity}`,
     140,
-    finalY + 12
+    finalY + 10
   );
 
+  // Grand Total
   doc.setFontSize(13);
 
   doc.text(
-    `Grand Total: ₹${grandTotal.toLocaleString("en-IN", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+    `Grand Total: ₹${Number(grandTotal).toLocaleString("en-IN", {
+      maximumFractionDigits: 0,
     })}`,
     140,
-    finalY + 22
+    finalY + 19
   );
 
-  // =====================
+  // ==================================================
+  // FOOTER LINE
+  // ==================================================
+
+  doc.setLineWidth(0.3);
+
+  doc.line(
+    14,
+    finalY + 26,
+    196,
+    finalY + 26
+  );
+
+  // ==================================================
   // FOOTER
-  // =====================
+  // ==================================================
 
-  doc.setFontSize(9);
+  doc.setFontSize(8);
 
-  // Download
-  doc.save(`Invoice-${invoiceNumber}.pdf`);
+  doc.text(
+    "Thank you for your business!",
+    105,
+    finalY + 33,
+    {
+      align: "center",
+    }
+  );
+
+  // ==================================================
+  // DOWNLOAD
+  // ==================================================
+
+  doc.save(
+    `Invoice-${invoiceNumber}.pdf`
+  );
 };

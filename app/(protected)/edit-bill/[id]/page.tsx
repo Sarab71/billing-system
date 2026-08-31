@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Calendar, Plus, Trash2, Loader2 } from "lucide-react";
+import { Calendar, Plus, Trash2, Loader2, Download } from "lucide-react";
 import { toast } from "sonner";
 import { generateInvoicePdf } from "@/app/utils/pdf/invoicePdf";
 
@@ -851,6 +851,15 @@ export default function EditBillPage() {
                 className="cursor-pointer rounded-md bg-red-600 px-5 py-2.5 text-sm font-medium text-white"
               >
                 {deleting ? "Deleting..." : "Delete Bill"}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleExportPDF}
+                className="cursor-pointer inline-flex items-center gap-2 rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
+              >
+                <Download size={17} />
+                Export as PDF
               </button>
 
               <button
