@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { Calendar, Edit, Download, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import CustomerSidebar from "../../components/CustomerSidebar";
-import { generateStatementPdf } from "../../utils/pdf/statementPdf";
-import EditCustomerForm from "../../components/EditCustomerForm";
+import CustomerSidebar from "@/app/components/CustomerSidebar";
+import EditCustomerForm from "@/app/components/EditCustomerForm";
+import { generateStatementPdf } from "@/app/utils/pdf/statementPdf";
 
 interface Customer {
     _id: string;

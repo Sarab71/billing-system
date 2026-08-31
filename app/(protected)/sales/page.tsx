@@ -10,7 +10,8 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import CustomerSidebar from "../components/CustomerSidebar";
+import CustomerSidebar from "@/app/components/CustomerSidebar";
+
 
 interface Customer {
   _id: string;
