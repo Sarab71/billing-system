@@ -166,11 +166,7 @@ export default function OutstandingPartiesPage() {
                 <p className="text-xl font-bold text-red-600">
                   ₹
                   {totalOutstanding.toLocaleString(
-                    "en-IN",
-                    {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }
+                    "en-IN"
                   )}
                 </p>
               </div>
@@ -288,11 +284,7 @@ export default function OutstandingPartiesPage() {
                           {Number(
                             customer.balance
                           ).toLocaleString(
-                            "en-IN",
-                            {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            }
+                            "en-IN"
                           )}
                         </span>
 

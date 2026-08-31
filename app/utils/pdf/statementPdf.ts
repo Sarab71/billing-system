@@ -237,10 +237,7 @@ export const generateStatementPdf = async ({
   doc.text(
     `Opening Balance: ₹${Number(
       openingBalance || 0
-    ).toLocaleString("en-IN", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`,
+    ).toLocaleString("en-IN")}`,
     105,
     y,
     {
@@ -259,10 +256,7 @@ export const generateStatementPdf = async ({
   doc.text(
     `Current Balance: ₹${Number(
       customer.balance || 0
-    ).toLocaleString("en-IN", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`,
+    ).toLocaleString("en-IN")}`,
     105,
     y,
     {

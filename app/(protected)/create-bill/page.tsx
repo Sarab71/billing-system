@@ -691,14 +691,24 @@ export default function CreateBillPage() {
 
           {/* Totals */}
           <div className="mt-7 flex justify-end">
-            <div className="text-right">
-              <p className="text-lg font-semibold text-gray-900">
-                Grand Total: ₹{grandTotal.toFixed(2)}
-              </p>
+            <div className="w-full max-w-xs space-y-2 rounded-md bg-gray-50 p-3 text-sm">
 
-              <p className="mt-2 text-base font-medium text-gray-800">
-                Total Quantity: {totalQuantity}
-              </p>
+              <div className="flex justify-between">
+                <span>Total Quantity</span>
+                <span className="font-semibold">
+                  {totalQuantity}
+                </span>
+              </div>
+
+              <div className="flex justify-between text-base">
+                <span className="font-semibold">
+                  Grand Total
+                </span>
+
+                <span className="font-bold text-blue-600">
+                  ₹{grandTotal.toLocaleString("en-IN")}
+                </span>
+              </div>
 
               <div className="mt-5 flex justify-end gap-3">
                 <button
@@ -713,12 +723,13 @@ export default function CreateBillPage() {
                 <button
                   type="button"
                   onClick={handleExportPDF}
-                  className="cursor-pointer inline-flex items-center gap-2 rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
+                  className="inline-flex cursor-pointer items-center gap-2 rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
                 >
                   <Download size={17} />
                   Export as PDF
                 </button>
               </div>
+
             </div>
           </div>
         </div>

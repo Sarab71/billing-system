@@ -19,7 +19,7 @@ interface DashboardData {
 }
 
 const formatCurrency = (amount: number) => {
-  return `₹${amount.toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 2, })}`;
+  return `₹${amount.toLocaleString("en-IN")}`;
 };
 
 const getToday = () => {

@@ -825,9 +825,6 @@ export default function EditBillPage() {
                     ₹
                     {grandTotal.toLocaleString(
                       "en-IN",
-                      {
-                        minimumFractionDigits: 2,
-                      }
                     )}
                   </span>
                 </div>

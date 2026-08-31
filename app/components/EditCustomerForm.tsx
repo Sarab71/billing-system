@@ -176,11 +176,7 @@ export default function EditCustomerForm({
           <p className="mt-1 text-lg font-bold text-gray-800">
             ₹
             {Number(customer.balance || 0).toLocaleString(
-              "en-IN",
-              {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }
+              "en-IN"
             )}
           </p>
         </div>

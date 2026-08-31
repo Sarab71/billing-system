@@ -272,17 +272,13 @@ doc.text(
 
       `₹${Number(
         item.rate
-      ).toLocaleString("en-IN", {
-        maximumFractionDigits: 0,
-      })}`,
+      ).toLocaleString("en-IN")}`,
 
       `${Number(item.discount) || 0}%`,
 
       `₹${calculateItemTotal(
         item
-      ).toLocaleString("en-IN", {
-        maximumFractionDigits: 0,
-      })}`,
+      ).toLocaleString("en-IN")}`,
     ]
   );
   autoTable(doc, {
@@ -378,9 +374,7 @@ doc.text(
   doc.setFontSize(13);
 
   doc.text(
-    `Grand Total: ₹${Number(grandTotal).toLocaleString("en-IN", {
-      maximumFractionDigits: 0,
-    })}`,
+    `Grand Total: ₹${Number(grandTotal).toLocaleString("en-IN")}`,
     140,
     finalY + 19
   );

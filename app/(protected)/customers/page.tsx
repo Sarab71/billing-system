@@ -40,10 +40,7 @@ const formatDate = (date: string) => {
 };
 
 const formatAmount = (amount: number) => {
-    return Number(amount).toLocaleString("en-IN", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
+    return Number(amount).toLocaleString("en-IN");
 };
 
 export default function CustomersPage() {

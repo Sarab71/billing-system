@@ -1049,11 +1049,7 @@ export default function ExpensesPage() {
                         <p className="font-semibold text-red-600">
                           ₹
                           {categoryTotal.toLocaleString(
-                            "en-IN",
-                            {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            }
+                            "en-IN"
                           )}
                         </p>
 
@@ -1198,11 +1194,7 @@ export default function ExpensesPage() {
                                         {Number(
                                           expense.amount
                                         ).toLocaleString(
-                                          "en-IN",
-                                          {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2,
-                                          }
+                                          "en-IN"
                                         )}
                                       </span>
 

@@ -41,10 +41,7 @@ interface Bill {
 }
 
 const formatCurrency = (amount: number) => {
-  return `₹${amount.toLocaleString("en-IN", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  })}`;
+  return `₹${amount.toLocaleString("en-IN")}`;
 };
 
 export default function SalesPage() {
