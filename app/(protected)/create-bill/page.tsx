@@ -125,7 +125,7 @@ export default function CreateBillPage() {
     const subtotal = qty * rate;
     const discountAmount = (subtotal * discount) / 100;
 
-    return subtotal - discountAmount;
+    return Math.round(subtotal - discountAmount);
 
   };
 

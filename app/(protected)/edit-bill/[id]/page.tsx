@@ -210,7 +210,7 @@ export default function EditBillPage() {
     const discountAmount =
       (subtotal * discount) / 100;
 
-    return subtotal - discountAmount;
+    return Math.round(subtotal - discountAmount);
   };
 
   const grandTotal = items.reduce(
