@@ -11,6 +11,7 @@ import {
   ReceiptIndianRupee,
   Calendar,
 } from "lucide-react";
+import BackupButton from "../components/BackupButton";
 
 interface DashboardData {
   totalPayments: number;
@@ -128,6 +129,10 @@ export default function Home() {
               <p className="mt-2 text-sm text-gray-500 sm:text-base">
                 Manage your customers, bills, payments and expenses
               </p>
+            </div>
+
+            <div className="mt-3 flex justify-center">
+              <BackupButton />
             </div>
 
             {/* Date Filters */}
