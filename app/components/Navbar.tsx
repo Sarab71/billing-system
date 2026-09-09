@@ -21,7 +21,6 @@ const menuItems = [
   { name: "Add Customer", icon: UserPlus, href: "/add-customer" },
   { name: "Customers", icon: User, href: "/customers" },
   { name: "Add Payment", icon: CreditCard, href: "/add-payment" },
-  { name: "Edit Payment", icon: Edit, href: "/edit-payment" },
   { name: "Expenses", icon: ReceiptText, href: "/expenses" },
   { name: "Create Bill", icon: FilePlus2, href: "/create-bill" },
   { name: "Sales", icon: TrendingUp, href: "/sales" },
